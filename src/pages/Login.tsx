@@ -49,7 +49,7 @@ const Login = () => {
       toast.success("Login successful!");
       
       // Navigate to the page they were trying to access or dashboard
-      navigate(from, { replace: true });
+      // navigate(from, { replace: true });
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Login failed. Please check your credentials.");

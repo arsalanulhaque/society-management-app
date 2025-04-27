@@ -1,20 +1,21 @@
-
+import { IMenuItem } from "./menu";
 // Adding to existing interfaces.ts file
+
+export interface IRole {
+  roleID: number;
+  roleName: string;
+}
 
 export interface IPermission {
   canView: boolean;
   canAdd: boolean;
   canEdit: boolean;
   canDelete: boolean;
+  [action: string]: boolean;
 }
 
 export interface IPermissions {
   [path: string]: IPermission;
-}
-
-export interface IRole {
-  roleID: number;
-  roleName: string;
 }
 
 export interface IAuthUser {
@@ -24,6 +25,7 @@ export interface IAuthUser {
   email?: string;
   role: IRole;
   permissions: IPermissions;
+  menus: IMenuItem[]; 
 }
 
 export interface IApiResponse<T> {

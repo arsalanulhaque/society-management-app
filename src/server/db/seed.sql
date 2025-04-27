@@ -19,7 +19,7 @@ INSERT INTO Menu (MenuID, MenuName, MenuURL, ParentMenuID) VALUES
 (7, 'Users', '/users', 3),
 (8, 'Reports', '/reports', 2);
 
--- Role-Menu permissions
+-- Role-Menu Permissions
 -- Admin has full access
 INSERT INTO RoleMenuMapping (RoleMenuMappingID, RoleID, MenuID, CanView, CanAdd, CanEdit, CanDelete) VALUES
 (1, 1, 1, 1, 1, 1, 1),   -- Admin - Dashboard

@@ -1,19 +1,20 @@
 
 import { ReactNode } from 'react';
+import { IPermission } from './interfaces';
 
-export interface SubMenuItem {
-  path: string;
-  title: string;
-  icon: ReactNode;
-  permission: 'canView' | 'canAdd' | 'canEdit' | 'canDelete';
-  roleID?: number; // Updated roleId to roleID for consistency
+export interface ISubMenuItem {
+  Path: string;
+  Title: string;
+  Icon: ReactNode;
+  Permission: keyof IPermission;
+  RoleID?: number; // Updated roleId to roleID for consistency
 }
 
-export interface MenuItem {
-  path: string;
-  title: string;
-  icon: ReactNode;
-  permission: 'canView' | 'canAdd' | 'canEdit' | 'canDelete';
-  roleID?: number; // Updated roleId to roleID for consistency
-  subItems?: SubMenuItem[];
+export interface IMenuItem {
+  Path: string;
+  Title: string;
+  Icon: ReactNode;
+  Permission: keyof IPermission;
+  RoleID?: number; // Updated roleId to roleID for consistency
+  SubItems?: ISubMenuItem[];
 }

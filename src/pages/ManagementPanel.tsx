@@ -9,6 +9,7 @@ import MonthlyMaintenanceTab from '@/components/management/MonthlyMaintenanceTab
 import ExportOptions from '@/components/management/ExportOptions';
 import AccessControlTab from '@/components/management/AccessControlTab';
 import { usePermissions } from '@/hooks/use-permissions';
+import { MenusTab } from './system-management/MenuTab';
 
 const ManagementPanel: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -64,16 +65,20 @@ const ManagementPanel: React.FC = () => {
               <KeyRound className="h-4 w-4" />
               <span>Access Control</span>
             </TabsTrigger>
+            <TabsTrigger value="menu" className="flex items-center gap-2">
+              <KeyRound className="h-4 w-4" />
+              <span>Menu</span>
+            </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="utilities-bills" className="mt-6">
             <UtilitiesBillsTab />
           </TabsContent>
-          
+
           <TabsContent value="monthly-maintenance" className="mt-6">
             <MonthlyMaintenanceTab />
           </TabsContent>
-          
+
           <TabsContent value="maintenance-requests" className="mt-6">
             <div className="text-center py-8 text-muted-foreground">
               <Wrench className="mx-auto h-12 w-12 mb-4 opacity-20" />
@@ -81,9 +86,13 @@ const ManagementPanel: React.FC = () => {
               <p>This feature is under development.</p>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="access-control" className="mt-6">
             <AccessControlTab />
+          </TabsContent>
+
+          <TabsContent value="menu" className="mt-6">
+            <MenusTab />
           </TabsContent>
         </Tabs>
 

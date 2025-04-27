@@ -99,6 +99,6 @@ export const api = {
   },
   
   async getPermissions() {
-    return apiClient.get<IRoleMenuMapping[]>('/permissions');
+    return apiClient.get<IRoleMenuMapping[]>('/Permissions');
   },
 };

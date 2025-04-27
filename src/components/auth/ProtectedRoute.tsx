@@ -3,15 +3,16 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
+import { IPermission } from '@/types/interfaces';
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
-  requiredPermission?: 'canView' | 'canAdd' | 'canEdit' | 'canDelete';
+  requiredPermission?: keyof IPermission;
 };
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  requiredPermission = 'canView'
+  requiredPermission = 'CanView'
 }) => {
   const { user, isLoading, hasPermission } = useAuth();
   const location = useLocation();
@@ -31,15 +32,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // For routes with query parameters, just check the base path for permissions
+  // For routes with query parameters, just check the base path for Permissions
   // This supports routes like /admin-tools?tab=houses
   const basePath = currentPath.split('?')[0];
   
-  // Check if user has the required permission for this route
+  // Check if user has the required Permission for this route
   if (!hasPermission(basePath, requiredPermission)) {
-    // Log the permission issue
-    console.log(`User lacks ${requiredPermission} permission for ${basePath}`);
-    return <Navigate to="/" replace />;
+    // Log the Permission issue
+    console.log(`User lacks ${requiredPermission} Permission for ${basePath}`);
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;

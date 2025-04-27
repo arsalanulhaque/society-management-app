@@ -1,35 +1,86 @@
 
 // Database interfaces based on MySQL tables
 
+export interface IAction {
+  ActionID: number;
+  ActionName: string;
+}
+
+export interface IRole {
+  RoleID: number;
+  RoleName: string;
+}
+
+export interface IMenu {
+  MenuID: number;
+  MenuName: string;
+  MenuURL: string | null;
+  ParentMenuID: number | null;
+  RoleID?: number | null; // Added RoleID to associate menus with roles
+  // Additional fields for hierarchy
+  Children?: IMenu[];
+  RoleName?: string; // Added to store the role name
+}
+
+export interface IMenuTable {
+  MenuID: number;
+  MenuName: string;
+  MenuURL?: string | null;
+  ParentMenuID?: number | null;
+  Position?: number | null;
+  ParentMenuName?: string | null;
+}
+export interface IMenuActionsMap {
+  MenuActionID: number;
+  MenuID: number;
+  ActionID: number;
+}
+
+export interface IRoleMenuActionsMap {
+  RoleMenuActionID: number,
+  RoleID: number,
+  MenuID: number,
+  ParentMenuID: number,
+  ActionID: number,
+  MenuName: string,
+  ActionName: string,
+  IsAllowed: number | boolean
+}
+
+export interface IMenuActionsMapView {
+  MenuActionID: number;
+  MenuID: number;
+  ActionID: number;
+  MenuName: string;
+  ActionName: string;
+}
+
+
 export interface IPlotType {
   TypeID: number;
   TypeName: string;
 }
 
-export interface IFloor {
+export interface IPlotFloor {
   FloorID: number;
   Floor: string;
-  Charges: number;
 }
 
 export interface IPlotCategory {
   CategoryID: number;
   CategoryName: string;
-  CategoryType: string; // R, A, B, C, D, etc.
-  Charges: number;
 }
 
 export interface IPlot {
   PlotID: number;
   HouseNo: string;
-  CategoryID: number;
-  FloorID: number;
-  TypeID: number;
   // Joined fields
-  CategoryName?: string;
-  Floor?: string;
-  TypeName?: string;
-  Charges?: number;
+  CategoryID: number;
+  CategoryName: string,
+  FloorID: number;
+  Floor: string,
+  TypeID: number;
+  TypeName: string
 }
 
 export interface IReceivable {
@@ -66,21 +117,7 @@ export interface IUser {
   RoleName?: string;
 }
 
-export interface IRole {
-  RoleID: number;
-  RoleName: string;
-}
 
-export interface IMenu {
-  MenuID: number;
-  MenuName: string;
-  MenuURL: string | null;
-  ParentMenuID: number | null;
-  RoleID?: number | null; // Added RoleID to associate menus with roles
-  // Additional fields for hierarchy
-  Children?: IMenu[];
-  RoleName?: string; // Added to store the role name
-}
 
 export interface IRoleMenuMapping {
   RoleMenuMappingID: number;
@@ -131,4 +168,52 @@ export interface ICategorySummary {
 export interface IFloorSummary {
   floor: string;
   count: number;
+}
+
+export interface IServiceRate {
+  RateID: number;
+  PlotTypeID: number;
+  TypeName: string;
+  PlotTypeRate: number;
+  PlotCategoryID: number;
+  CategoryName: string;
+  PlotCategoryRate: number;
+  FloorID: number;
+  Floor: string;
+  FloorRate: number;
+  TotalAmount: number;
+  Month: number;
+  Year: number,
+  IsActive: boolean;
+}
+
+export interface IPaymentPlan {
+  PaymentPlanID: number;
+  PlotID: number;
+  RateID: number;
+  StartDate: string; // ISO date string
+  EndDate: string;   // ISO date string
+  Frequency: string; // e.g. 'Monthly', 'Quarterly'
+  TotalAmount: number;
+  Status: string; // e.g. 'Active', 'Inactive'
+}
+
+export interface IPaymentSchedule {
+  PaymentScheduleID: number;
+  PlanID: number;
+  DueDate: string;      // ISO date string
+  Amount: number;
+  IsPaid: boolean;
+  PaymentDate?: string | null; // optional if not paid yet
+  ReceiptID?: number | null;   // optional if not paid yet
+}
+
+export interface IPaymentReceipt {
+  ReceiptID: number;
+  PaymentScheduleID: number;
+  PaidAmount: number;
+  PaidOn: string; // ISO date string
+  PaymentMode: string; // e.g. 'Cash', 'Card', 'Bank Transfer'
+  ReferenceNumber?: string | null;
+  Remarks?: string | null;
 }

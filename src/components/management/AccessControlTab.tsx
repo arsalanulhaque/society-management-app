@@ -39,7 +39,7 @@ const AccessControlTab: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<number | null>(null);
   const { toast } = useToast();
 
-  // Fetch roles, menus, and permissions
+  // Fetch roles, menus, and Permissions
   const { data: roles, isLoading: rolesLoading, refetch: refetchRoles } = useQuery({
     queryKey: ['roles'],
     queryFn: () => api.getRoles(),
@@ -50,8 +50,8 @@ const AccessControlTab: React.FC = () => {
     queryFn: () => api.getMenus(),
   });
 
-  const { data: permissions, isLoading: permissionsLoading, refetch: refetchPermissions } = useQuery({
-    queryKey: ['permissions'],
+  const { data: Permissions, isLoading: PermissionsLoading, refetch: refetchPermissions } = useQuery({
+    queryKey: ['Permissions'],
     queryFn: () => api.getPermissions(),
   });
 
@@ -143,11 +143,11 @@ const AccessControlTab: React.FC = () => {
     }
   };
 
-  // Update permission toggle
-  const handlePermissionToggle = async (roleId: number, menuId: number, permission: 'CanView' | 'CanAdd' | 'CanEdit' | 'CanDelete', currentValue: boolean) => {
+  // Update Permission toggle
+  const handlePermissionToggle = async (roleId: number, menuId: number, Permission: 'CanView' | 'CanAdd' | 'CanEdit' | 'CanDelete', currentValue: boolean) => {
     try {
       // Mock API call (replace with actual API)
-      console.log(`Toggle ${permission} for roleId=${roleId}, menuId=${menuId} to ${!currentValue}`);
+      console.log(`Toggle ${Permission} for roleId=${roleId}, menuId=${menuId} to ${!currentValue}`);
       toast({
         title: "Permission updated",
         description: `Permission has been ${!currentValue ? "granted" : "revoked"}.`,
@@ -156,7 +156,7 @@ const AccessControlTab: React.FC = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to update permission. Please try again.",
+        description: "Failed to update Permission. Please try again.",
         variant: "destructive",
       });
     }
@@ -208,11 +208,11 @@ const AccessControlTab: React.FC = () => {
     }
   };
 
-  // Helper function to get permission for a role-menu combination
-  const getPermission = (roleId: number, menuId: number, permission: 'CanView' | 'CanAdd' | 'CanEdit' | 'CanDelete'): boolean => {
-    if (!permissions?.data) return false;
-    const mapping = permissions.data.find(p => p.RoleID === roleId && p.MenuID === menuId);
-    return mapping ? mapping[permission] : false;
+  // Helper function to get Permission for a role-menu combination
+  const getPermission = (roleId: number, menuId: number, Permission: 'CanView' | 'CanAdd' | 'CanEdit' | 'CanDelete'): boolean => {
+    if (!Permissions?.data) return false;
+    const mapping = Permissions.data.find(p => p.RoleID === roleId && p.MenuID === menuId);
+    return mapping ? mapping[Permission] : false;
   };
 
   // Helper function to get role name
@@ -223,7 +223,7 @@ const AccessControlTab: React.FC = () => {
   };
 
   // Render loading state
-  if (rolesLoading || menusLoading || permissionsLoading) {
+  if (rolesLoading || menusLoading || PermissionsLoading) {
     return (
       <div className="flex justify-center items-center h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -238,7 +238,7 @@ const AccessControlTab: React.FC = () => {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="roles">Roles Management</TabsTrigger>
           <TabsTrigger value="menus">Menu Management</TabsTrigger>
-          <TabsTrigger value="permissions">Rights & Permissions</TabsTrigger>
+          <TabsTrigger value="Permissions">Rights & Permissions</TabsTrigger>
         </TabsList>
 
         {/* Roles Management Tab */}
@@ -258,7 +258,7 @@ const AccessControlTab: React.FC = () => {
                   <DialogDescription>
                     {editingRole 
                       ? "Update the details for this role." 
-                      : "Create a new role to assign to users and manage permissions."}
+                      : "Create a new role to assign to users and manage Permissions."}
                   </DialogDescription>
                 </DialogHeader>
                 <Form {...roleForm}>
@@ -516,7 +516,7 @@ const AccessControlTab: React.FC = () => {
         </TabsContent>
 
         {/* Rights & Permissions Tab */}
-        <TabsContent value="permissions" className="space-y-4">
+        <TabsContent value="Permissions" className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Rights & Permissions</h2>
 

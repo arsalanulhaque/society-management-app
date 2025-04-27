@@ -1,6 +1,7 @@
 
 import { apiClient } from '@/api/api-client';
 import { IAuthUser, IApiResponse } from '@/types/interfaces';
+import { IMenuItem, ISubMenuItem } from '@/types/menu';
 
 export const authService = {
   /**
@@ -39,28 +40,32 @@ export const authService = {
   },
 
   /**
-   * Check if the user has the given permission for a specific route
+   * Check if the user has the given Permission for a specific route
    */
-  hasPermission(user: IAuthUser | null, path: string, permission: 'canView' | 'canAdd' | 'canEdit' | 'canDelete'): boolean {
+  hasPermission(user: IAuthUser | null, path: string, Permission: 'canView' | 'canAdd' | 'canEdit' | 'canDelete'): boolean {
     if (!user || !user.permissions) {
       return false;
     }
 
     // Normalize path (remove trailing slash)
     const normalizedPath = path.endsWith('/') ? path.slice(0, -1) : path;
-    
+
     // First try exact match
     if (user.permissions[normalizedPath]) {
-      return !!user.permissions[normalizedPath][permission];
+      return !!user.permissions[normalizedPath][Permission];
     }
-    
-    // Check if the path is a subpath of any permission
+
+    // Check if the path is a subpath of any Permission
     for (const permPath in user.permissions) {
       if (normalizedPath.startsWith(permPath)) {
-        return !!user.permissions[permPath][permission];
+        return !!user.permissions[permPath][Permission];
       }
     }
-    
+
     return false;
-  }
+  },
+
+  async menuItems(): Promise<IApiResponse<{ menuItem: IMenuItem[]; token: string }>> {
+    return apiClient.get('/menus');
+  },
 };

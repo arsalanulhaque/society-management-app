@@ -120,7 +120,7 @@ SELECT
 FROM Menu m
 LEFT JOIN Menu p ON m.ParentMenuID = p.MenuID;
 
--- Role menu permissions
+-- Role menu Permissions
 CREATE OR REPLACE VIEW vw_RoleMenuPermissions AS
 SELECT 
     rmm.RoleMenuMappingID,

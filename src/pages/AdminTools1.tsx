@@ -14,7 +14,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IUser, IRole, IPlotType, IPlotCategory } from '@/types/database';
 
-const AdminTools: React.FC = () => {
+const AdminTools1: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabFromUrl || 'houses');
@@ -535,9 +535,9 @@ const BuildingRegistryTab: React.FC = () => {
   ];
 
   const plotCategories: IPlotCategory[] = [
-    { CategoryID: 1, CategoryName: 'Category A', CategoryType: 'A', Charges: 200 },
-    { CategoryID: 2, CategoryName: 'Category B', CategoryType: 'B', Charges: 300 },
-    { CategoryID: 3, CategoryName: 'Category C', CategoryType: 'C', Charges: 400 }
+    { CategoryID: 1, CategoryName: 'Category A',  Charges: 200 },
+    { CategoryID: 2, CategoryName: 'Category B',  Charges: 300 },
+    { CategoryID: 3, CategoryName: 'Category C',  Charges: 400 }
   ];
 
   const plotTypeFormSchema = z.object({
@@ -592,7 +592,6 @@ const BuildingRegistryTab: React.FC = () => {
     setSelectedCategory(category);
     categoryForm.reset({
       CategoryName: category.CategoryName,
-      CategoryType: category.CategoryType,
       Charges: category.Charges
     });
     setActiveForm('category');
@@ -752,7 +751,7 @@ const BuildingRegistryTab: React.FC = () => {
                         name="Charges"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Base Charges</FormLabel>
+                            <FormLabel>Charges</FormLabel>
                             <FormControl>
                               <Input type="number" placeholder="0.00" {...field} />
                             </FormControl>
@@ -789,13 +788,12 @@ const BuildingRegistryTab: React.FC = () => {
                 <div className="grid grid-cols-8 p-4 bg-muted/50 font-medium text-sm">
                   <div className="col-span-3">Category Name</div>
                   <div className="col-span-1">Type</div>
-                  <div className="col-span-2">Base Charges</div>
+                  <div className="col-span-2">Charges</div>
                   <div className="col-span-2">Actions</div>
                 </div>
                 {plotCategories.map(category => (
                   <div key={category.CategoryID} className="grid grid-cols-8 p-4 border-t items-center text-sm">
                     <div className="col-span-3">{category.CategoryName}</div>
-                    <div className="col-span-1">{category.CategoryType}</div>
                     <div className="col-span-2">${category.Charges}</div>
                     <div className="col-span-2 flex gap-2">
                       <Button 
@@ -1051,4 +1049,4 @@ const DocumentTemplatesTab: React.FC = () => {
   );
 };
 
-export default AdminTools;
+export default AdminTools1;
