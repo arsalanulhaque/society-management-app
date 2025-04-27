@@ -95,8 +95,8 @@ app.post('/api/auth/login', async (req, res) => {
 
     // Find user
     const [users] = await pool.query(
-      'SELECT u.*, r.RoleName FROM User u JOIN Role r ON u.RoleID = r.RoleID WHERE u.Username = ?',
-      [username], ' and password = ?', [password]
+      'SELECT u.*, r.RoleName FROM User u JOIN Role r ON u.RoleID = r.RoleID WHERE u.Username = ? and password = ?', 
+      [username, password]
     );
 
     if (users.length === 0) {
@@ -603,7 +603,7 @@ Roles Crud
 app.get('/api/role-permissions/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
-  
+
     const [rows] = await pool.query('SELECT * FROM societydb.vw_menuaction_rolepermissions where RoleID = ?', [id]);
     res.json({ success: true, data: rows });
   } catch (error) {
@@ -986,10 +986,10 @@ app.get('/api/service-rate', verifyToken, async (req, res) => {
 // Add new Service Rate
 app.post('/api/service-rate', verifyToken, async (req, res) => {
   try {
-    const { PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, Month, Year, IsActive } = req.body;
+    const { PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear, EndMonth, EndYear, IsActive } = req.body;
     const [result] = await pool.query(
-      'INSERT INTO societydb.servicerate (PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, Month, Year, IsActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, Month, Year, IsActive]
+      'INSERT INTO societydb.servicerate (PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear,EndMonth, EndYear, IsActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear, EndMonth, EndYear, IsActive]
     );
     res.status(201).json({ success: true, message: 'Service rate added', rateId: result.insertId });
   } catch (error) {
@@ -1002,10 +1002,11 @@ app.post('/api/service-rate', verifyToken, async (req, res) => {
 app.put('/api/service-rate/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const { PlotTypeID, PlotCategoryID, PerFloorRate, EffectiveFromDate, Status } = req.body;
+    const { PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear, EndMonth, EndYear, IsActive } = req.body;
     await pool.query(
-      'UPDATE societydb.servicerate SET PlotTypeID = ?, PlotCategoryID = ?, PerFloorRate = ?, EffectiveFromDate = ?, Status = ? WHERE RateID = ?',
-      [PlotTypeID, PlotCategoryID, PerFloorRate, EffectiveFromDate, Status, id]
+      `UPDATE societydb.servicerate SET PlotTypeID = ?, PlotTypeRate = ?, PlotCategoryID = ?, PlotCategoryRate = ?, FloorID = ?, FloorRate = ?, TotalAmount = ?, 
+      StartMonth = ?, StartYear = ?, EndMonth = ?, EndYear = ?, IsActive = ? WHERE RateID = ?`,
+      [PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear, EndMonth, EndYear, IsActive, id]
     );
     res.json({ success: true, message: 'Service rate updated' });
   } catch (error) {

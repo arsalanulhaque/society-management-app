@@ -10,6 +10,7 @@ import { PlotCategoryTab } from './PlotCategoryTab';
 import { PlotFloorTab } from './PlotFloorTab';
 import { useAuth } from '@/contexts/AuthContext';
 import Unauthorized from '@/pages/Unauthorized';
+import { IMenuItem, ISubMenuItem } from '@/types/menu';
 
 const SocietyManagement: React.FC = () => {
   const location = useLocation();
@@ -17,6 +18,7 @@ const SocietyManagement: React.FC = () => {
   const { menus, hasPermission } = useAuth();
   const tabFromUrl = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabFromUrl || 'houses');
+  const [tabs, setTabs] = useState<ISubMenuItem[]>([]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -28,6 +30,11 @@ const SocietyManagement: React.FC = () => {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl, activeTab]);
+
+  useEffect(() => {
+    const _tabs = menus.filter((item) => item.Path.includes(location.pathname))
+    setTabs(_tabs[0].SubItems)
+  }, [menus, location.pathname]);
 
   return (
     <MainLayout showBackButton>
@@ -44,26 +51,16 @@ const SocietyManagement: React.FC = () => {
           className="w-full"
           onValueChange={handleTabChange}>
           <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="plots" className="flex items-center gap-2">
-              <Home className="h-4 w-4" />
-              <span>Plots Management</span>
-            </TabsTrigger>
-            <TabsTrigger value="plot-users" className="flex items-center gap-2">
-              <Home className="h-4 w-4" />
-              <span>Plots Users</span>
-            </TabsTrigger>
-            <TabsTrigger value="plot-category" className="flex items-center gap-2">
-              <Home className="h-4 w-4" />
-              <span>Plots Category</span>
-            </TabsTrigger>
-            <TabsTrigger value="plot-type" className="flex items-center gap-2">
-              <Home className="h-4 w-4" />
-              <span>Plots Type</span>
-            </TabsTrigger>
-            <TabsTrigger value="plot-floors" className="flex items-center gap-2">
-              <Home className="h-4 w-4" />
-              <span>Plots Floors</span>
-            </TabsTrigger>
+            {
+              tabs.map(item => {
+                return <>
+                  <TabsTrigger value={item.Path.split('=')[1]} className="flex items-center gap-2">
+                    <Home className="h-4 w-4" />
+                    <span>{item.Title}</span>
+                  </TabsTrigger>
+                </>
+              })
+            }
           </TabsList>
 
           <TabsContent value="plots" className="mt-6">

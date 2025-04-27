@@ -182,8 +182,10 @@ export interface IServiceRate {
   Floor: string;
   FloorRate: number;
   TotalAmount: number;
-  Month: number;
-  Year: number,
+  StartMonth: number;
+  StartYear: number,
+  EndMonth: number;
+  EndYear: number,
   IsActive: boolean;
 }
 

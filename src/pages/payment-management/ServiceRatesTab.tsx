@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Info, PenSquare, Plus, Trash2 } from 'lucide-react';
+import { Info, PenSquare, Plus, Trash2, WalletCards } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useServiceRates } from './useServiceRates';
@@ -15,6 +15,7 @@ import { IServiceRate } from '@/types/database';
 import { YearDropdown } from '@/components/common/year-dropdown/YearDropdown';
 import { Switch } from "@/components/ui/switch";
 import useMonths from "@/hooks/useMonths"
+import { Label } from '@/components/ui/label';
 
 const ServiceRateSchema = z.object({
   PlotTypeID: z.coerce.number().min(1, 'Type is required'),
@@ -24,16 +25,18 @@ const ServiceRateSchema = z.object({
   FloorID: z.coerce.number().min(1, 'Floor is required'),
   FloorRate: z.coerce.number().min(1, 'Per Floor Rate is required'),
   TotalAmount: z.number(),
-  Month: z.coerce.number().min(1, 'Month is required'),
-  Year: z.coerce.number().min(1, 'Floor is required'),
+  StartMonth: z.coerce.number().min(1, 'Start Month is required'),
+  StartYear: z.coerce.number().min(1, 'Start Year is required'),
+  EndMonth: z.coerce.number().min(1, 'End Month is required'),
+  EndYear: z.coerce.number().min(1, 'End Year is required'),
   IsActive: z.boolean()
 });
 
 export const ServiceRatesTab: React.FC = () => {
   const { pathname, search } = useLocation();
   const fullUrl = pathname + search;
-  const { user , hasPermission} = useAuth();
-  const { serviceRates, addRate, updateRate, deleteRate, refresh, plotCategories, plotTypes, plotFloors, calculateTotal } = useServiceRates();
+  const { user, hasPermission } = useAuth();
+  const { serviceRates, handleGeneratePaymentPlan, addRate, updateRate, deleteRate, refresh, plotCategories, plotTypes, plotFloors, calculateTotal } = useServiceRates();
   const { months, findMonthByValue, } = useMonths()
   const [activeForm, setActiveForm] = useState(false);
   const [selectedRate, setSelectedRate] = useState<IServiceRate | null>(null);
@@ -48,8 +51,10 @@ export const ServiceRatesTab: React.FC = () => {
       FloorID: 0,
       FloorRate: 0,
       TotalAmount: 0,
-      Month: 0,
-      Year: new Date().getFullYear(),
+      StartMonth: 0,
+      StartYear: new Date().getFullYear(),
+      EndMonth: 0,
+      EndYear: new Date().getFullYear(),
       IsActive: false,
     },
   });
@@ -76,7 +81,8 @@ export const ServiceRatesTab: React.FC = () => {
       PlotTypeID: 0, PlotTypeRate: 0,
       PlotCategoryID: 0, PlotCategoryRate: 0,
       FloorID: 0, FloorRate: 0,
-      Month: 0, Year: 0,
+      StartMonth: 0, StartYear: 0,
+      EndMonth: 0, EndYear: 0,
       IsActive: false, TotalAmount: 0
     });
     setActiveForm(true);
@@ -93,8 +99,6 @@ export const ServiceRatesTab: React.FC = () => {
     // });
     setActiveForm(true);
   };
-
-  const handleGeneratePaymentPlan = (rate: IServiceRate) => { }
 
   const handleDelete = async (id: number) => {
     await deleteRate(id);
@@ -120,7 +124,8 @@ export const ServiceRatesTab: React.FC = () => {
         PlotTypeID: 0, PlotTypeRate: 0,
         PlotCategoryID: 0, PlotCategoryRate: 0,
         FloorID: 0, FloorRate: 0,
-        Month: 0, Year: 0,
+        StartMonth: 0, StartYear: 0,
+        EndMonth: 0, EndYear: 0,
         IsActive: false, TotalAmount: 0
       });
     }
@@ -129,10 +134,10 @@ export const ServiceRatesTab: React.FC = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Service Rates</h2>
+        <h2 className="text-2xl font-bold">Service Charges</h2>
         {hasPermission(fullUrl, 'CanAdd') && (
           <Button onClick={handleAdd} className="flex items-center gap-2">
-            <Plus size={16} /> Add Rate
+            <Plus size={16} /> New Charges
           </Button>
         )}
       </div>
@@ -147,12 +152,12 @@ export const ServiceRatesTab: React.FC = () => {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                  {/* Month */}
+                  {/* Start Month */}
                   <FormField control={form.control}
-                    name="Month"
+                    name="StartMonth"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Month</FormLabel>
+                        <FormLabel>Start Month</FormLabel>
                         <FormControl>
                           <Select onValueChange={field.onChange} value={field?.value?.toString()}>
                             <SelectTrigger>
@@ -179,12 +184,12 @@ export const ServiceRatesTab: React.FC = () => {
                       </FormItem>
                     )}
                   />
-                  {/* Year */}
+                  {/* Start Year */}
                   <FormField control={form.control}
-                    name="Year"
+                    name="StartYear"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Year</FormLabel>
+                        <FormLabel>Start Year</FormLabel>
                         <FormControl>
                           <YearDropdown value={field.value?.toString()} onChange={field.onChange} />
                         </FormControl>
@@ -192,6 +197,53 @@ export const ServiceRatesTab: React.FC = () => {
                       </FormItem>
                     )}
                   />
+
+                  {/* End Month */}
+                  <FormField control={form.control}
+                    name="EndMonth"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>End Month</FormLabel>
+                        <FormControl>
+                          <Select onValueChange={field.onChange} value={field?.value?.toString()}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a Month" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="0">Choose an option</SelectItem>
+                              <SelectItem value="1">January</SelectItem>
+                              <SelectItem value="2">February</SelectItem>
+                              <SelectItem value="3">March</SelectItem>
+                              <SelectItem value="4">April</SelectItem>
+                              <SelectItem value="5">May</SelectItem>
+                              <SelectItem value="6">June</SelectItem>
+                              <SelectItem value="7">July</SelectItem>
+                              <SelectItem value="8">August</SelectItem>
+                              <SelectItem value="9">September</SelectItem>
+                              <SelectItem value="10">October</SelectItem>
+                              <SelectItem value="11">November</SelectItem>
+                              <SelectItem value="12">December</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Start Year */}
+                  <FormField control={form.control}
+                    name="EndYear"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>End Year</FormLabel>
+                        <FormControl>
+                          <YearDropdown value={field.value?.toString()} onChange={field.onChange} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   {/* Type ID */}
                   <FormField control={form.control}
                     name="PlotTypeID"
@@ -351,58 +403,69 @@ export const ServiceRatesTab: React.FC = () => {
         </CardHeader>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>All Service Rates</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
-            <div className="grid grid-cols-12 p-4 bg-muted/50 font-medium text-sm">
-              <div className="col-span-1">Type</div>
-              <div className="col-span-1">Category</div>
-              <div className="col-span-1">Floor</div>
-              <div className="col-span-1">Type-Rate</div>
-              <div className="col-span-1">Category-Rate</div>
-              <div className="col-span-1">Floor-Rate</div>
-              <div className="col-span-1">Total Amount</div>
-              <div className="col-span-1">Effective From</div>
-              <div className="col-span-1">Status</div>
-              <div className="col-span-3"></div>
-            </div>
-            {serviceRates.map((rate) => (
-              <div key={rate.RateID} className="grid grid-cols-12 p-4 border-t text-sm items-center">
-                <div className="col-span-1">{rate.TypeName}</div>
-                <div className="col-span-1">{rate.CategoryName}</div>
-                <div className="col-span-1">{rate.Floor}</div>
-                <div className="col-span-1">Rs. {rate.PlotTypeRate}</div>
-                <div className="col-span-1">Rs. {rate.PlotCategoryRate}</div>
-                <div className="col-span-1">Rs. {rate.FloorRate}</div>
-                <div className="col-span-1">Rs. {rate.TotalAmount}</div>
-                <div className="col-span-1">{findMonthByValue(rate.Month)}/{rate.Year}</div>
-                <div className="col-span-1"><div className="transform scale-50"><Switch disabled
-                  className="cursor-default opacity-70" checked={rate.IsActive} /></div></div>
-                <div className="col-span-2 flex gap-2">
-                  {hasPermission(fullUrl, 'GeneratePaymentPlan') && (
-                    <Button variant="outline" size="sm" onClick={() => handleGeneratePaymentPlan(rate)} className="flex items-center gap-1">
-                      <PenSquare size={14} /> Generate Payment Plan
-                    </Button>
-                  )}
-                  {hasPermission(fullUrl, 'CanUpdate') && (
-                    <Button variant="outline" size="sm" onClick={() => handleEdit(rate)} className="flex items-center gap-1">
-                      <PenSquare size={14} /> Edit
-                    </Button>
-                  )}
-                  {hasPermission(fullUrl, 'CanDelete') && (
-                    <Button variant="outline" size="sm" onClick={() => handleDelete(rate.RateID)} className="text-red-500 hover:text-red-600 flex items-center gap-1">
-                      <Trash2 size={14} />
-                    </Button>
-                  )}
+
+
+      {serviceRates.map((rate) => (
+        <div className="grid grid-cols-2 space-x-4">
+          <Card >
+            <CardHeader className='bg-muted/50'>
+              <CardTitle>
+                <div className="grid grid-cols-2 flex gap-2 ">
+                  <div className='flex justify-start'>Period: {findMonthByValue(rate.StartMonth)}/{rate.StartYear} - {findMonthByValue(rate.EndMonth)}/{rate.EndYear}</div>
+                  <div className='flex justify-end'>Status:&nbsp; {rate.IsActive ? <span>Active</span> : <span>InActive</span>}</div>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+
+              <div key={rate.RateID} className="border-t pt-4">
+                <div className="grid grid-cols-3 flex gap-2 text-md">
+                  {/* className="grid grid-cols-6 p-4 border-t items-center text-sm"> */}
+                  <div className='col-span-1 font-medium'>
+                    <p>Plot Type:</p>
+                    <p>Category:</p>
+                    <p>Plot Floor:</p>
+                    <p className="py-2">&nbsp;</p>
+
+                  </div>
+
+                  <div className='col-span-1'>
+                    <p>{rate.TypeName}</p>
+                    <p>{rate.CategoryName}</p>
+                    <p>{rate.Floor}</p>
+                    <p className="border-t border-b py-2 font-medium">Total Amount:</p>
+                  </div>
+
+                  <div className='col-span-1'>
+                    <p>Rs. {rate.PlotTypeRate}</p>
+                    <p>Rs. {rate.PlotCategoryRate}</p>
+                    <p>Rs. {rate.FloorRate}</p>
+                    <p className="border-t border-b py-2 font-medium">Rs. {rate.TotalAmount}</p>
+                  </div>
+
+                  <div className="col-span-3 flex justify-end gap-2">
+                    {hasPermission(fullUrl, 'CanGeneratePaymentPlan') && (
+                      <Button variant="outline" size="sm" onClick={() => handleGeneratePaymentPlan(rate)} className="flex items-center gap-1">
+                        <WalletCards size={14} /> Generate Payment Plan
+                      </Button>
+                    )}
+                    {hasPermission(fullUrl, 'CanUpdate') && (
+                      <Button variant="outline" size="sm" onClick={() => handleEdit(rate)} className="flex items-center gap-1">
+                        <PenSquare size={14} /> Edit
+                      </Button>
+                    )}
+                    {hasPermission(fullUrl, 'CanDelete') && (
+                      <Button variant="outline" size="sm" onClick={() => handleDelete(rate.RateID)} className="text-red-500 hover:text-red-600 flex items-center gap-1">
+                        <Trash2 size={14} />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>))}
+
     </div>
   );
 };

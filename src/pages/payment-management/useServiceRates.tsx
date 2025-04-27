@@ -107,6 +107,11 @@ export const useServiceRates = () => {
     return Number(typeRate || 0) + Number(categoryRate || 0) + Number(floorRate || 0);
   };
 
+  const handleGeneratePaymentPlan = (rate: IServiceRate) => { 
+
+  }
+
+
   useEffect(() => {
     fetchRates();
   }, [plotCategories]);
@@ -119,6 +124,7 @@ export const useServiceRates = () => {
     deleteRate,
     refresh: fetchRates,
     calculateTotal,
+    handleGeneratePaymentPlan,
     plotCategories, plotTypes, plotFloors
   };
 };
