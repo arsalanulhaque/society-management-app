@@ -29,7 +29,6 @@ export const useMenuActionsMap = () => {
       const data = await response.json();
       setMenuActions(data.data as IMenuActionsMapView[]);
       setFilterMenuList(menus[0])
-      getFilteredMenuActions()
     } catch (error) {
       console.error('Fetch error:', error);
     } finally {
@@ -38,7 +37,7 @@ export const useMenuActionsMap = () => {
   };
 
   const getFilteredMenuActions = () => {
-    return menuActions.filter(menuAction => {
+    return menuActions?.filter(menuAction => {
       // Category filter
       const menuMatch =
         !filterMenuList || filterMenuList.MenuID === 0 || menuAction.MenuID === filterMenuList.MenuID;
@@ -70,6 +69,7 @@ export const useMenuActionsMap = () => {
         toast.error('Failed to add Menu Action Map')
         throw new Error('Failed to add Menu Action Map');
       }
+      setMenuActions(data.data as IMenuActionsMapView[]);
       setLoading(false);
     } catch (error) {
       console.error('Add error:', error);
@@ -121,8 +121,8 @@ export const useMenuActionsMap = () => {
       else
         toast.error(data.message);
 
-      setMenuActions(prev => prev.filter(cat => cat.MenuActionID !== menuActionID));
       if (!response.ok) throw new Error('Failed to delete Menu Action Map');
+      fetchMenuActionsMap()
       setLoading(false);
     } catch (error) {
       console.error('Delete error:', error);

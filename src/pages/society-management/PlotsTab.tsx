@@ -8,10 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Info, PenSquare, Plus, Trash2 } from 'lucide-react';
-import { IPlot, IPlotType, IPlotFloor } from '@/types/database';
+import { IPlot, } from '@/types/database';
 import { useForm } from 'react-hook-form';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from '@/components/ui/select'; // Adjust the import path as needed
 import { usePlot } from './usePlot';
+import { IconTooltip } from '@/components/common/IconTooltip';
 
 const PlotFormSchema = z.object({
   HouseNo: z.string().min(1, "House number is required"),
@@ -90,13 +91,13 @@ export const PlotsTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 border p-4 rounded-md ">
       {loading ? (
         <p>Loading...</p>
       ) : (
         <>
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Plot Management</h2>
+          <div className="flex justify-between items-center border-b pb-4 mb-4">
+            <h2 className="text-2xl font-bold">Manage Plots</h2>
             {hasPermission(fullUrl, 'CanAdd') &&
               (
                 <Button onClick={handleAddPlot} className="flex items-center gap-2">
@@ -311,15 +312,25 @@ export const PlotsTab: React.FC = () => {
                         <div className="col-span-3">{plot?.CategoryName}</div>
                         <div className="col-span-3">{plot?.TypeName}</div>
                         <div className="col-span-2">{plot?.Floor}</div>
-                        <div className="col-span-2 flex gap-2">
+                        <div className="col-span-2 flex gap-2 justify-end">
                           {hasPermission(fullUrl, 'CanUpdate') &&
-                            (<Button variant="outline" size="sm" onClick={() => handleEditPlot(plot)} className="flex items-center gap-1">
-                              <PenSquare size={14} />
-                              <span>Edit</span>
-                            </Button>)}
-                          {hasPermission(fullUrl, 'CanDelete') && (<Button variant="outline" size="sm" onClick={() => handleDeletePlot(plot.PlotID)} className="text-red-500 hover:text-red-600 flex items-center gap-1">
-                            <Trash2 size={14} />
-                          </Button>)}
+                            (
+                              <IconTooltip tooltip='Edit'>
+                                <Button variant="outline" size="sm" onClick={() => handleEditPlot(plot)} 
+                                className="flex items-center gap-1 bg-slate-200 text-slate-500 hover:bg-slate-100">
+                                  <PenSquare size={14} />
+                                </Button>
+                              </IconTooltip>
+                            )}
+                          {hasPermission(fullUrl, 'CanDelete') &&
+                            (
+                              <IconTooltip tooltip='Delete'>
+                                <Button variant="outline" size="sm" onClick={() => handleDeletePlot(plot.PlotID)}
+                                  className="flex items-center gap-1 bg-slate-200 text-red-500 hover:text-red-500 hover:bg-slate-100">
+                                  <Trash2 size={14} />
+                                </Button>
+                              </IconTooltip>
+                            )}
                         </div>
                       </div>
                     ))}

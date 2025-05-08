@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from 
 import { PenSquare, Plus, Trash2 } from 'lucide-react';
 import { IPlotFloor } from '@/types/database';
 import { usePlotFloor } from './usePlotFloor';
+import { IconTooltip } from '@/components/common/IconTooltip';
 
 const PlotFloorFormSchema = z.object({
   Floor: z.string().min(1, "Floor is required"),
@@ -77,12 +78,12 @@ export const PlotFloorTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 border p-4 rounded-md ">
       {loading ? (
         <p>Loading...</p>
       ) : (
         <>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center border-b pb-4 mb-4">
             <h2 className="text-2xl font-bold">Plot Floors</h2>
 
 
@@ -132,50 +133,46 @@ export const PlotFloorTab: React.FC = () => {
             </Card>
           )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Floor List</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <div className="grid grid-cols-4 p-4 bg-muted/50 font-medium text-sm">
-                  <div className="col-span-1">Floor</div>
+          <div className="rounded-md border">
+            <div className="grid grid-cols-4 p-4 bg-muted/50 font-medium text-sm">
+              <div className="col-span-1">Floor</div>
+            </div>
+            {plotFloors.map((floor) => (
+              <div
+                key={floor.FloorID}
+                className="grid grid-cols-4 p-4 border-t text-sm items-center"
+              >
+                <div className="col-span-1">{floor.Floor}</div>
+                <div className="col-span-3 flex justify-end gap-2">
+                  {hasPermission(fullUrl, 'CanUpdate') && (
+                    <IconTooltip tooltip='Edit'>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditFloor(floor)}
+                        className="flex items-center gap-1 bg-slate-200 text-slate-500 hover:bg-slate-100"
+                      >
+                        <PenSquare size={14} />
+                      </Button>
+                    </IconTooltip>
+                  )}
+                  {hasPermission(fullUrl, 'CanDelete') && (
+                    <IconTooltip tooltip='Delete'>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteFloor(floor.FloorID)}
+                        className="flex items-center gap-1 bg-slate-200 text-red-500 hover:text-red-500 hover:bg-slate-100"
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </IconTooltip>
+                  )}
                 </div>
-                {plotFloors.map((floor) => (
-                  <div
-                    key={floor.FloorID}
-                    className="grid grid-cols-4 p-4 border-t text-sm items-center"
-                  >
-                    <div className="col-span-1">{floor.Floor}</div>
-                    <div className="col-span-3 flex justify-end gap-2">
-                      {hasPermission(fullUrl, 'CanUpdate') && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditFloor(floor)}
-                          className="flex items-center gap-1"
-                        >
-                          <PenSquare size={14} />
-                          <span>Edit</span>
-                        </Button>
-                      )}
-                      {hasPermission(fullUrl, 'CanDelete') && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteFloor(floor.FloorID)}
-                          className="text-red-500 hover:text-red-600 flex items-center gap-1"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
               </div>
+            ))}
+          </div>
 
-            </CardContent>
-          </Card>
         </>)}
     </div>
   );

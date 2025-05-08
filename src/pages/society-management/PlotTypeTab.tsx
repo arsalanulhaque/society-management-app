@@ -11,15 +11,16 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from 
 import { PenSquare, Plus, Trash2 } from 'lucide-react';
 import { IPlotType } from '@/types/database';
 import { usePlotType } from './usePlotType';
+import { IconTooltip } from '@/components/common/IconTooltip';
 
 const plotTypeFormSchema = z.object({
     TypeName: z.string().min(1, "Type name is required"),
 });
 
 export const PlotTypeTab: React.FC = () => {
-    const {pathname, search} = useLocation();
-      const fullUrl = pathname + search;
-      const { user, hasPermission } = useAuth();
+    const { pathname, search } = useLocation();
+    const fullUrl = pathname + search;
+    const { user, hasPermission } = useAuth();
 
     const {
         plotTypes,
@@ -75,12 +76,12 @@ export const PlotTypeTab: React.FC = () => {
     };
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 border p-4 rounded-md ">
             {loading ? (
                 <p>Loading...</p>
             ) : (
                 <>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center border-b pb-4 mb-4">
                         <h2 className="text-2xl font-bold">Plot Types</h2>
 
                         {hasPermission(fullUrl, 'CanAdd') && (
@@ -126,48 +127,43 @@ export const PlotTypeTab: React.FC = () => {
                         </Card>
                     )}
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Plot Types List</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="rounded-md border">
-                                <div className="grid grid-cols-6 p-4 bg-muted/50 font-medium text-sm">
-                                    <div className="col-span-4">Type Name</div>
+                    <div className="rounded-md border">
+                        <div className="grid grid-cols-6 p-4 bg-muted/50 font-medium text-sm">
+                            <div className="col-span-4">Type Name</div>
+                        </div>
+                        {plotTypes.map(type => (
+                            <div key={type.TypeID}
+                                className="grid grid-cols-4 p-4 border-t items-center text-sm"
+                            >
+                                <div className="col-span-1">{type.TypeName}</div>
+                                <div className="col-span-3 flex justify-end gap-2">
+                                    {hasPermission(fullUrl, 'CanUpdate') && (
+                                        <IconTooltip tooltip='Edit'>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleEditType(type)}
+                                                className="flex items-center gap-1 bg-slate-200 text-slate-500 hover:bg-slate-100">
+                                                <PenSquare size={14} />
+                                            </Button>
+                                        </IconTooltip>
+                                    )}
+                                    {hasPermission(fullUrl, 'CanDelete') && (
+                                        <IconTooltip tooltip='Delete'>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex items-center gap-1 bg-slate-200 text-red-500 hover:text-red-500 hover:bg-slate-100"
+                                                onClick={() => handleDeleteType(type.TypeID)}>
+                                                <Trash2 size={14} />
+                                            </Button>
+                                        </IconTooltip>
+                                    )}
                                 </div>
-                                {plotTypes.map(type => (
-                                    <div key={type.TypeID}
-                                        className="grid grid-cols-4 p-4 border-t items-center text-sm"
-                                    >
-                                        <div className="col-span-1">{type.TypeName}</div>
-                                        <div className="col-span-3 flex justify-end gap-2">
-                                            {hasPermission(fullUrl, 'CanUpdate') && (
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => handleEditType(type)}
-                                                    className="flex items-center gap-1"
-                                                >
-                                                    <PenSquare size={14} />
-                                                    <span>Edit</span>
-                                                </Button>
-                                            )}
-                                            {hasPermission(fullUrl, 'CanDelete') && (
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="flex items-center gap-1 text-red-500 hover:text-red-600"
-                                                    onClick={() => handleDeleteType(type.TypeID)}
-                                                >
-                                                    <Trash2 size={14} />
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
                             </div>
-                        </CardContent>
-                    </Card>
+                        ))}
+                    </div>
+
                 </>)}
         </div>
     );

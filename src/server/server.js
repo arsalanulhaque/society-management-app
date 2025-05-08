@@ -17,16 +17,27 @@ app.use(bodyParser.json());
 
 // Database connection
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'maintenance_system',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  port: process.env.DB_PORT,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 };
 
 const pool = mysql.createPool(dbConfig);
+
+app.get('/health/mysql', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', message: 'MySQL connection successful' });
+  } catch (error) {
+    console.error('MySQL connection error:', error.message);
+    res.status(500).json({ status: 'error', message: 'MySQL connection failed', error: error.message });
+  }
+});
 
 app.get('/', async (req, res) => { res.status(200).json({ message: 'Service is running!' }) })
 
@@ -95,7 +106,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     // Find user
     const [users] = await pool.query(
-      'SELECT u.*, r.RoleName FROM User u JOIN Role r ON u.RoleID = r.RoleID WHERE u.Username = ? and password = ?', 
+      'SELECT u.*, r.RoleName FROM User u JOIN Role r ON u.RoleID = r.RoleID WHERE u.Username = ? and password = ?',
       [username, password]
     );
 
@@ -515,8 +526,8 @@ app.put('/api/menuactionsmap/:id', verifyToken, async (req, res) => {
 app.delete('/api/menuactionsmap/:id', verifyToken, async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query(`DELETE FROM societydb.menuactionsmapping WHERE MenuActionID = ?`, [id]);
-    res.status(204).end();
+    await pool.query(`DELETE FROM menuactionsmapping WHERE MenuActionID = ?`, [id]);
+    res.json({ success: true, message: 'Menu Actions Mapping deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -986,10 +997,11 @@ app.get('/api/service-rate', verifyToken, async (req, res) => {
 // Add new Service Rate
 app.post('/api/service-rate', verifyToken, async (req, res) => {
   try {
-    const { PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear, EndMonth, EndYear, IsActive } = req.body;
+    const { PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear, EndMonth, EndYear, IsActive,
+      DueOnDay, GracePeriodDays, PenaltyAmount, IsPenaltyApply, } = req.body;
     const [result] = await pool.query(
-      'INSERT INTO societydb.servicerate (PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear,EndMonth, EndYear, IsActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear, EndMonth, EndYear, IsActive]
+      'INSERT INTO societydb.servicerate (PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear,EndMonth, EndYear, IsActive,DueOnDay, GracePeriodDays,  PenaltyAmount,  IsPenaltyApply) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)',
+      [PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear, EndMonth, EndYear, IsActive, DueOnDay, GracePeriodDays, PenaltyAmount, IsPenaltyApply]
     );
     res.status(201).json({ success: true, message: 'Service rate added', rateId: result.insertId });
   } catch (error) {
@@ -1002,11 +1014,13 @@ app.post('/api/service-rate', verifyToken, async (req, res) => {
 app.put('/api/service-rate/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const { PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear, EndMonth, EndYear, IsActive } = req.body;
+    const { PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear, EndMonth, EndYear, IsActive,
+      DueOnDay, GracePeriodDays, PenaltyAmount, IsPenaltyApply
+    } = req.body;
     await pool.query(
       `UPDATE societydb.servicerate SET PlotTypeID = ?, PlotTypeRate = ?, PlotCategoryID = ?, PlotCategoryRate = ?, FloorID = ?, FloorRate = ?, TotalAmount = ?, 
-      StartMonth = ?, StartYear = ?, EndMonth = ?, EndYear = ?, IsActive = ? WHERE RateID = ?`,
-      [PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear, EndMonth, EndYear, IsActive, id]
+      StartMonth = ?, StartYear = ?, EndMonth = ?, EndYear = ?, IsActive = ?, DueOnDay = ?, GracePeriodDays = ?, PenaltyAmount = ?, IsPenaltyApply = ? WHERE RateID = ?`,
+      [PlotTypeID, PlotTypeRate, PlotCategoryID, PlotCategoryRate, FloorID, FloorRate, TotalAmount, StartMonth, StartYear, EndMonth, EndYear, IsActive, DueOnDay, GracePeriodDays, PenaltyAmount, IsPenaltyApply, id]
     );
     res.json({ success: true, message: 'Service rate updated' });
   } catch (error) {
@@ -1030,42 +1044,47 @@ app.delete('/api/service-rate/:id', verifyToken, async (req, res) => {
 /*
 PaymentPlan 
 */
-app.get('/api/payment-plan', verifyToken, async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT * FROM societydb.paymentplan');
-    res.json({ success: true, data: rows });
-  } catch (error) {
-    console.error('Get payment plans error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
 app.post('/api/payment-plan', verifyToken, async (req, res) => {
   try {
-    const { PlotID, RateID, StartDate, EndDate, Frequency, TotalAmount, Status } = req.body;
-    const [result] = await pool.query(
-      'INSERT INTO societydb.paymentplan (PlotID, RateID, StartDate, EndDate, Frequency, TotalAmount, Status) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [PlotID, RateID, StartDate, EndDate, Frequency, TotalAmount, Status]
+    const { RateID } = req.body; // Expecting array of IRoleMenuActionsMap
+
+    const [result] = await pool.query('CALL CreatePaymentPlanFromServiceRate(?)', [RateID]
     );
-    res.status(201).json({ success: true, message: 'Payment plan added', planId: result.insertId });
+
+    res.status(201).json({
+      success: true,
+      message: 'Payment plan generated successfully',
+    });
   } catch (error) {
-    console.error('Add payment plan error:', error);
+    console.error('Payment plan generation error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-app.put('/api/payment-plan/:id', verifyToken, async (req, res) => {
+/*
+Get Full Payment Plan
+*/
+app.get('/api/payment-plan-full/:PaymentPlanID', verifyToken, async (req, res) => {
   try {
-    const { id } = req.params;
-    const { PlotID, RateID, StartDate, EndDate, Frequency, TotalAmount, Status } = req.body;
-    await pool.query(
-      'UPDATE societydb.paymentplan SET PlotID = ?, RateID = ?, StartDate = ?, EndDate = ?, Frequency = ?, TotalAmount = ?, Status = ? WHERE PaymentPlanID = ?',
-      [PlotID, RateID, StartDate, EndDate, Frequency, TotalAmount, Status, id]
-    );
-    res.json({ success: true, message: 'Payment plan updated' });
-  } catch (error) {
-    console.error('Update payment plan error:', error);
-    res.status(500).json({ message: 'Server error' });
+    const { PaymentPlanID } = req.params;
+    const [rows] = await pool.execute('CALL GetFullPaymentPlanAsJson(?)', [PaymentPlanID]);
+
+    // MariaDB wraps result in [rows, ...] and our procedure returns a single row
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/*
+Get All Payment Plan
+*/
+app.get('/api/payment-plan', verifyToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query('select * from societydb.paymentplanmaster');
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
@@ -1076,6 +1095,26 @@ app.delete('/api/payment-plan/:id', verifyToken, async (req, res) => {
     res.json({ success: true, message: 'Payment plan deleted' });
   } catch (error) {
     console.error('Delete payment plan error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/*
+Payment Plan Details
+*/
+app.get('/api/payment-plan-details/:PaymentPlanID', verifyToken, async (req, res) => {
+  try {
+    const {  PaymentPlanID  } = req.params; // Expecting array of IRoleMenuActionsMap
+
+    const [result] = await pool.query('select * from PaymentPlanDetails Where PaymentPlanID = (?)', [PaymentPlanID]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Payment plan generated successfully',
+    });
+  } catch (error) {
+    console.error('Payment plan generation error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

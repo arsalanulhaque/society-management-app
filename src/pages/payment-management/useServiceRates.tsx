@@ -14,7 +14,7 @@ export const useServiceRates = () => {
   const [serviceRates, setServiceRates] = useState<IServiceRate[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchRates = async () => {
+  const fetchServiceRates = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('auth_token');
@@ -46,7 +46,7 @@ export const useServiceRates = () => {
       const data = await res.json();
       if (res.ok) {
         toast.success('Rate added');
-        fetchRates();
+        fetchServiceRates();
         return true;
       } else {
         toast.error(data.message);
@@ -72,7 +72,7 @@ export const useServiceRates = () => {
       const data = await res.json();
       if (res.ok) {
         toast.success('Rate updated');
-        fetchRates();
+        fetchServiceRates();
         return true;
       } else {
         toast.error(data.message);
@@ -107,13 +107,34 @@ export const useServiceRates = () => {
     return Number(typeRate || 0) + Number(categoryRate || 0) + Number(floorRate || 0);
   };
 
-  const handleGeneratePaymentPlan = (rate: IServiceRate) => { 
-
+  const handleGeneratePaymentPlan = async (rate: IServiceRate) => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API_BASE_URL}/payment-plan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(rate),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message);
+        fetchServiceRates();
+        return true;
+      } else {
+        toast.error(data.message);
+        return false;
+      }
+    } catch (err) {
+      toast.error('Error createing Payment Plan');
+      return false;
+    }
   }
 
-
   useEffect(() => {
-    fetchRates();
+    fetchServiceRates();
   }, [plotCategories]);
 
   return {
@@ -122,7 +143,7 @@ export const useServiceRates = () => {
     addRate,
     updateRate,
     deleteRate,
-    refresh: fetchRates,
+    refresh: fetchServiceRates,
     calculateTotal,
     handleGeneratePaymentPlan,
     plotCategories, plotTypes, plotFloors

@@ -7,20 +7,21 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {  Form,  FormControl,  FormField,  FormItem,  FormLabel,  FormMessage,} from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from '@/components/ui/form';
 import { PenSquare, Plus, Trash2 } from 'lucide-react';
 import { IPlotCategory } from '@/types/database';
 import { usePlotCategory } from './usePlotCategory';
+import { IconTooltip } from '@/components/common/IconTooltip';
 
 const PlotCategoryFormSchema = z.object({
   CategoryName: z.string().min(1, "Category name is required"),
 });
 
 export const PlotCategoryTab: React.FC = () => {
-  const {pathname, search} = useLocation();
-    const fullUrl = pathname + search;
-    const { user , hasPermission} = useAuth();
-    
+  const { pathname, search } = useLocation();
+  const fullUrl = pathname + search;
+  const { user, hasPermission } = useAuth();
+
   const {
     plotCategories,
     addCategory,
@@ -42,7 +43,7 @@ export const PlotCategoryTab: React.FC = () => {
 
   const handleAddCategory = () => {
     setSelectedCategory(null);
-    categoryForm.reset({ CategoryName: "",  });
+    categoryForm.reset({ CategoryName: "", });
     setActiveForm(true);
   };
 
@@ -73,16 +74,16 @@ export const PlotCategoryTab: React.FC = () => {
     setActiveForm(false);
     setSelectedCategory(null);
     refresh();
-    categoryForm.reset({ CategoryName: "",  });
+    categoryForm.reset({ CategoryName: "", });
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 border p-4 rounded-md ">
       {loading ? (
         <p>Loading...</p>
       ) : (
         <>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center border-b pb-4 mb-4">
             <h2 className="text-2xl font-bold">Plot Categories</h2>
 
 
@@ -132,50 +133,46 @@ export const PlotCategoryTab: React.FC = () => {
             </Card>
           )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Plot Categories List</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <div className="grid grid-cols-4 p-4 bg-muted/50 font-medium text-sm">
-                  <div className="col-span-1">Category Name</div>
+          <div className="rounded-md border">
+            <div className="grid grid-cols-4 p-4 bg-muted/50 font-medium text-sm">
+              <div className="col-span-1">Category Name</div>
+            </div>
+            {plotCategories.map((category) => (
+              <div
+                key={category.CategoryID}
+                className="grid grid-cols-4 p-4 border-t text-sm items-center"
+              >
+                <div className="col-span-1">{category.CategoryName}</div>
+                <div className="col-span-3 flex justify-end gap-2">
+                  {hasPermission(fullUrl, 'CanUpdate') && (
+                    <IconTooltip tooltip='Edit'>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditCategory(category)}
+                        className="flex items-center gap-1 bg-slate-200 text-slate-500 hover:bg-slate-100"
+                      >
+                        <PenSquare size={14} />
+                      </Button>
+                    </IconTooltip>
+                  )}
+                  {hasPermission(fullUrl, 'CanDelete') && (
+                    <IconTooltip tooltip='Delete'>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteCategory(category.CategoryID)}
+                        className="flex items-center gap-1 bg-slate-200 text-red-500 hover:text-red-500 hover:bg-slate-100"
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </IconTooltip>
+                  )}
                 </div>
-                {plotCategories.map((category) => (
-                  <div
-                    key={category.CategoryID}
-                    className="grid grid-cols-4 p-4 border-t text-sm items-center"
-                  >
-                    <div className="col-span-1">{category.CategoryName}</div>
-                    <div className="col-span-3 flex justify-end gap-2">
-                      {hasPermission(fullUrl, 'CanUpdate') && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditCategory(category)}
-                          className="flex items-center gap-1"
-                        >
-                          <PenSquare size={14} />
-                          <span>Edit</span>
-                        </Button>
-                      )}
-                      {hasPermission(fullUrl, 'CanDelete') && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteCategory(category.CategoryID)}
-                          className="text-red-500 hover:text-red-600 flex items-center gap-1"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
               </div>
+            ))}
+          </div>
 
-            </CardContent>
-          </Card>
         </>)}
     </div>
   );

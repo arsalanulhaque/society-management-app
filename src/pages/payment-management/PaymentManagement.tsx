@@ -4,6 +4,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Home, DollarSign, PenSquare, AlertCircle, Info, Users, Building, FileText, Plus, Trash2 } from 'lucide-react';
 import { ServiceRatesTab } from './ServiceRatesTab';
+import { PaymentPlanTab } from './PaymentPlanTab';
 
 const PaymentManagement: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,7 +26,7 @@ const PaymentManagement: React.FC = () => {
     <MainLayout showBackButton>
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Society Management</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Payment Management</h1>
           <p className="text-muted-foreground mt-1">
             Manage houses, users, buildings, documents, and maintenance fee plans.
           </p>
@@ -41,9 +42,9 @@ const PaymentManagement: React.FC = () => {
               <Home className="h-4 w-4" />
               <span>Service Charges</span>
             </TabsTrigger>
-            <TabsTrigger value="payment-plan" className="flex items-center gap-2">
+            <TabsTrigger value="payment-plans" className="flex items-center gap-2">
               <Home className="h-4 w-4" />
-              <span>Payment Plan</span>
+              <span>Payment Plans</span>
             </TabsTrigger>
             <TabsTrigger value="payment-receipt" className="flex items-center gap-2">
               <Home className="h-4 w-4" />
@@ -59,7 +60,8 @@ const PaymentManagement: React.FC = () => {
             <ServiceRatesTab />
           </TabsContent>
 
-          <TabsContent value="payment-plan" className="mt-6">
+          <TabsContent value="payment-plans" className="mt-6">
+            <PaymentPlanTab />
           </TabsContent>
 
           <TabsContent value="payment-receipt" className="mt-6">

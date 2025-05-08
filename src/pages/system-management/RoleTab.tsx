@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from 
 import { PenSquare, Plus, Trash2 } from 'lucide-react';
 import { IRole } from '@/types/database';
 import { useRole } from './useRole';
+import { IconTooltip } from '@/components/common/IconTooltip';
 
 const RoleFormSchema = z.object({
   RoleName: z.string().min(1, "Role name is required"),
@@ -21,7 +22,7 @@ export const RoleTab: React.FC = () => {
   const fullUrl = pathname + search;
   const { hasPermission } = useAuth();
 
-  const { roles, loading, addRole, updateRole, deleteRole, refresh} = useRole();
+  const { roles, loading, addRole, updateRole, deleteRole, refresh } = useRole();
 
   const [activeForm, setActiveForm] = useState<boolean>(false);
   const [selectedRole, setSelectedRole] = useState<IRole | null>(null);
@@ -70,14 +71,13 @@ export const RoleTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 border p-4 rounded-md ">
       {loading ? (
         <p>Loading...</p>
       ) : (
         <>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center border-b pb-4 mb-4">
             <h2 className="text-2xl font-bold">Roles</h2>
-
 
             {hasPermission(fullUrl, 'CanAdd') && (
               <Button onClick={handleAddRole} className="flex items-center gap-2">
@@ -125,51 +125,44 @@ export const RoleTab: React.FC = () => {
             </Card>
           )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Role List</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <div className="grid grid-cols-4 p-4 bg-muted/50 font-medium text-sm">
-                  <div className="col-span-1">Role</div>
-                </div>
-                {roles.map((role) => (
-                  <div
-                    key={role.RoleID}
-                    className="grid grid-cols-4 p-4 border-t text-sm items-center"
-                  >
-                    <div className="col-span-1">{role.RoleName}</div>
-                    <div className="col-span-3 flex justify-end gap-2">
-                      {hasPermission(fullUrl, 'CanUpdate') && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditRole(role)}
-                          className="flex items-center gap-1"
-                        >
-                          <PenSquare size={14} />
-                          <span>Edit</span>
-                        </Button>
-                      )}
-                      {hasPermission(fullUrl, 'CanDelete') && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteRole(role.RoleID)}
-                          className="text-red-500 hover:text-red-600 flex items-center gap-1"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+          <div className="rounded-md border">
+            <div className="grid grid-cols-4 p-4 bg-muted/50 font-medium text-sm">
+              <div className="col-span-1">Role</div>
+            </div>
+            {roles.map((role) => (
+              <div
+                key={role.RoleID}
+                className="grid grid-cols-4 p-4 border-t text-sm items-center"
+              >
+                <div className="col-span-1">{role.RoleName}</div>
+                <div className="col-span-3 flex justify-end gap-2">
+                  {hasPermission(fullUrl, 'CanUpdate') && (
+                    <IconTooltip tooltip="Edit">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditRole(role)}
+                        className="flex items-center gap-1 bg-slate-200 text-slate-500 hover:bg-slate-100">
+                        <PenSquare size={14} />
+                      </Button>
+                    </IconTooltip>)}
+                  {hasPermission(fullUrl, 'CanDelete') && (
+                    <IconTooltip tooltip="Delete">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteRole(role.RoleID)}
+                        className="flex items-center gap-1 bg-slate-200 text-red-500 hover:text-red-500 hover:bg-slate-100">
+                        <Trash2 size={14} />
+                      </Button>
+                    </IconTooltip>)}
 
-            </CardContent>
-          </Card>
+                </div>
+              </div>
+            ))}
+          </div>
+
         </>)}
-    </div>
+    </div >
   );
 };

@@ -1,105 +1,85 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, } from 'react';
+import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import { IPaymentPlan } from '@/types/database';
+import { IFullPaymentPlan, IPaymentPlanMaster, IPaymentPlanDetail, IServiceRate, IPlot } from '@/types/interfaces';
 
 const API_BASE_URL = 'http://localhost:4000/api';
 
 export const usePaymentPlan = () => {
-  const [paymentPlans, setPaymentPlans] = useState<IPaymentPlan[]>([]);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const paramPaymentPlanID = queryParams.get('PaymentPlanID'); // get value of ?myParam=...
+
+  const [paymentPlans, setPaymentPlans] = useState<IPaymentPlanMaster[]>();
+  const [paymentDetails, setPaymentDetail] = useState<IPaymentPlanDetail>();
+  const [fullPaymentPlan, setFullPaymentPlan] = useState<IFullPaymentPlan>();
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchPlans = async () => {
+  const fetchFullPaymentPlan = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('auth_token');
-      const res = await fetch(`${API_BASE_URL}/payment-plan`, {
+      const res = await fetch(`${API_BASE_URL}/payment-plan-full/${paramPaymentPlanID}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      setPaymentPlans(data.data);
+
+      // Parse the JsonResult from the API response
+      const response = await res.json();
+      if (!res.ok) throw new Error(response.message);
+      const data = JSON.parse(response.data[0][0].Result);
+      // Assuming the data structure is like the one you provided
+      const fullPaymentPlan: IFullPaymentPlan = {
+        PaymentPlanMaster: JSON.parse(JSON.stringify(data.PaymentPlan)) as IPaymentPlanMaster, // PaymentPlan is already an object, so it's used directly
+        PaymentPlanDetails: JSON.parse(JSON.stringify(data.Installments)) as IPaymentPlanDetail[], // Parse the stringified Installments array
+        ServiceRate: JSON.parse(JSON.stringify(data.ServiceRates)) as IServiceRate, // Parse the stringified ServiceRates array
+        Plots: JSON.parse(JSON.stringify(data.Plots)) as IPlot[], // Parse the stringified Plots array
+      };
+
+      setFullPaymentPlan(fullPaymentPlan);
     } catch (err) {
-      toast.error('Failed to load payment plans');
+      toast.error('Failed to load payment plan');
     } finally {
       setLoading(false);
     }
   };
 
-  const addPlan = async (plan: Omit<IPaymentPlan, 'PaymentPlanID'>) => {
+  const fetchAllPaymentPlans = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem('auth_token');
-      const res = await fetch(`${API_BASE_URL}/payment-plan`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(plan),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        toast.success('Payment plan added');
-        fetchPlans();
-      } else {
-        toast.error(data.message);
-      }
-    } catch (err) {
-      toast.error('Error adding plan');
-    }
-  };
-
-  const updatePlan = async (plan: IPaymentPlan) => {
-    try {
-      const token = localStorage.getItem('auth_token');
-      const res = await fetch(`${API_BASE_URL}/payment-plan/${plan.PaymentPlanID}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(plan),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        toast.success('Payment plan updated');
-        fetchPlans();
-      } else {
-        toast.error(data.message);
-      }
-    } catch (err) {
-      toast.error('Error updating plan');
-    }
-  };
-
-  const deletePlan = async (id: number) => {
-    try {
-      const token = localStorage.getItem('auth_token');
-      const res = await fetch(`${API_BASE_URL}/payment-plan/${id}`, {
-        method: 'DELETE',
+      const res = await fetch(`${API_BASE_URL}/payment-plan/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      if (res.ok) {
-        toast.success('Plan deleted');
-        setPaymentPlans((prev) => prev.filter((p) => p.PaymentPlanID !== id));
-      } else {
-        toast.error(data.message);
-      }
+
+      // Parse the JsonResult from the API response
+      const response = await res.json();
+      if (!res.ok) throw new Error(response.message);
+      const data = response;
+
+      setPaymentPlans(data.data as IPaymentPlanMaster[]);
     } catch (err) {
-      toast.error('Error deleting plan');
+      toast.error('Failed to load payment plan');
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchPlans();
-  }, []);
+    if (paramPaymentPlanID === null)
+      fetchAllPaymentPlans()
+    else fetchFullPaymentPlan();
+  }, [location.search]);
+
 
   return {
     paymentPlans,
+    fullPaymentPlan,
     loading,
-    addPlan,
-    updatePlan,
-    deletePlan,
-    refresh: fetchPlans,
+    fetchAllPaymentPlans: fetchAllPaymentPlans,
+  
+    // addPlan,
+    // updatePlan,
+    // deletePlan,
+    refresh: fetchFullPaymentPlan,
   };
 };

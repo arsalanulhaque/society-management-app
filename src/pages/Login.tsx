@@ -30,7 +30,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  
+
   // Get the redirect path from location state or default to "/"
   const from = location.state?.from?.pathname || "/";
 
@@ -47,7 +47,7 @@ const Login = () => {
       // Use the login function from AuthContext
       await login(values.username, values.password);
       toast.success("Login successful!");
-      
+
       // Navigate to the page they were trying to access or dashboard
       // navigate(from, { replace: true });
     } catch (error) {
@@ -75,10 +75,10 @@ const Login = () => {
                   <FormControl>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input 
-                        placeholder="username" 
-                        className="pl-10" 
-                        {...field} 
+                      <Input
+                        placeholder="username"
+                        className="pl-10"
+                        {...field}
                       />
                     </div>
                   </FormControl>
@@ -96,11 +96,11 @@ const Login = () => {
                   <FormControl>
                     <div className="relative">
                       <LockKeyhole className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input 
-                        type="password" 
-                        placeholder="••••••••" 
-                        className="pl-10" 
-                        {...field} 
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        className="pl-10"
+                        {...field}
                       />
                     </div>
                   </FormControl>
@@ -110,8 +110,8 @@ const Login = () => {
             />
 
             <div className="flex justify-between items-center">
-              <Link 
-                to="/forgot-password" 
+              <Link
+                to="/forgot-password"
                 className="text-sm text-blue-600 hover:text-blue-800"
               >
                 Forgot password?
@@ -122,22 +122,6 @@ const Login = () => {
               Login
             </Button>
 
-            <div className="mt-4">
-              <p className="text-sm text-gray-500">
-                Login with these demo accounts:
-              </p>
-              <div className="mt-2 grid grid-cols-1 gap-2 text-xs">
-                <div className="bg-gray-50 p-2 rounded">
-                  <div><strong>Admin:</strong> admin@example.com / password</div>
-                </div>
-                <div className="bg-gray-50 p-2 rounded">
-                  <strong>Manager:</strong> manager@example.com / password
-                </div>
-                <div className="bg-gray-50 p-2 rounded">
-                  <strong>User:</strong> user@example.com / password
-                </div>
-              </div>
-            </div>
           </form>
         </Form>
 

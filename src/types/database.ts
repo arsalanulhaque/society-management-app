@@ -80,7 +80,8 @@ export interface IPlot {
   FloorID: number;
   Floor: string,
   TypeID: number;
-  TypeName: string
+  TypeName: string;
+  UserID: number | null;
 }
 
 export interface IReceivable {
@@ -185,19 +186,30 @@ export interface IServiceRate {
   StartMonth: number;
   StartYear: number,
   EndMonth: number;
-  EndYear: number,
+  EndYear: number;
   IsActive: boolean;
+  PaymentPlanID: number;
+
+  GracePeriodDays: number|null;
+  DueOnDay: number|null;
+  PenaltyAmount: number|null;
+  IsPenaltyApply: boolean|null;
 }
 
-export interface IPaymentPlan {
+export interface IPaymentPlanMaster {
   PaymentPlanID: number;
-  PlotID: number;
-  RateID: number;
-  StartDate: string; // ISO date string
-  EndDate: string;   // ISO date string
-  Frequency: string; // e.g. 'Monthly', 'Quarterly'
-  TotalAmount: number;
-  Status: string; // e.g. 'Active', 'Inactive'
+  PaymentPlanName: string;
+  Description: string;
+  CreatedAt: string;
+}
+
+export interface IPaymentPlanDetail{
+  PaymentPlanDetailID: number;
+  PaymentPlanID: number,
+  InstallmentNumber: number,
+  DueDate: string;
+  Percentage: number;
+  CreatedAd: Date;
 }
 
 export interface IPaymentSchedule {
@@ -218,4 +230,10 @@ export interface IPaymentReceipt {
   PaymentMode: string; // e.g. 'Cash', 'Card', 'Bank Transfer'
   ReferenceNumber?: string | null;
   Remarks?: string | null;
+}
+export interface IFullPaymentPlan {
+  PaymentPlan: IPaymentPlanMaster;
+  Installments: IPaymentPlanDetail[];
+  ServiceRates: IServiceRate[];
+  Plots: IPlot[];
 }

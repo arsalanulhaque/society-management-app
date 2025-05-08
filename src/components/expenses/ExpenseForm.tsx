@@ -8,14 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { api } from '@/api/api';
 import { ISocietyExpense } from '@/types/database';
 import { FormModal } from '@/components/common/FormModal';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,13 +17,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Loader2, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '@/components/ui/select';
 
 // Define validation schema
 const expenseFormSchema = z.object({
@@ -118,7 +105,7 @@ export function ExpenseForm({ open, onOpenChange, initialData, onSuccess }: Expe
         MonthYear: values.monthYear,
         Amount: values.amount,
         IsPaid: values.isPaid,
-        PaidOnDate: values.isPaid && values.paidOnDate 
+        PaidOnDate: values.isPaid && values.paidOnDate
           ? format(values.paidOnDate, 'yyyy-MM-dd')
           : null,
       };
@@ -136,7 +123,7 @@ export function ExpenseForm({ open, onOpenChange, initialData, onSuccess }: Expe
           description: "Expense added successfully",
         });
       }
-      
+
       form.reset();
       onOpenChange(false);
       if (onSuccess) onSuccess();
@@ -168,7 +155,7 @@ export function ExpenseForm({ open, onOpenChange, initialData, onSuccess }: Expe
     const options = [];
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
-    
+
     // Generate options for past 2 years, current year, and next year
     for (let year = currentYear - 2; year <= currentYear + 1; year++) {
       for (let month = 1; month <= 12; month++) {
@@ -177,7 +164,7 @@ export function ExpenseForm({ open, onOpenChange, initialData, onSuccess }: Expe
         options.push(`${formattedMonth}/${year}`);
       }
     }
-    
+
     return options;
   };
 
@@ -216,7 +203,7 @@ export function ExpenseForm({ open, onOpenChange, initialData, onSuccess }: Expe
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="expanseTitle"
@@ -230,7 +217,7 @@ export function ExpenseForm({ open, onOpenChange, initialData, onSuccess }: Expe
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="description"
@@ -238,10 +225,10 @@ export function ExpenseForm({ open, onOpenChange, initialData, onSuccess }: Expe
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea 
-                    placeholder="Enter description (optional)" 
-                    className="resize-none" 
-                    {...field} 
+                  <Textarea
+                    placeholder="Enter description (optional)"
+                    className="resize-none"
+                    {...field}
                     value={field.value || ''}
                   />
                 </FormControl>
@@ -249,7 +236,7 @@ export function ExpenseForm({ open, onOpenChange, initialData, onSuccess }: Expe
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="monthYear"
@@ -274,7 +261,7 @@ export function ExpenseForm({ open, onOpenChange, initialData, onSuccess }: Expe
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="amount"
@@ -282,19 +269,19 @@ export function ExpenseForm({ open, onOpenChange, initialData, onSuccess }: Expe
               <FormItem>
                 <FormLabel>Amount</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="number" 
-                    min="0" 
-                    step="0.01" 
-                    placeholder="Enter amount" 
-                    {...field} 
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="Enter amount"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="isPaid"
@@ -312,7 +299,7 @@ export function ExpenseForm({ open, onOpenChange, initialData, onSuccess }: Expe
               </FormItem>
             )}
           />
-          
+
           {isPaid && (
             <FormField
               control={form.control}
@@ -354,11 +341,11 @@ export function ExpenseForm({ open, onOpenChange, initialData, onSuccess }: Expe
               )}
             />
           )}
-          
+
           <div className="flex justify-end gap-2 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >

@@ -25,7 +25,7 @@ export interface IAuthUser {
   email?: string;
   role: IRole;
   permissions: IPermissions;
-  menus: IMenuItem[]; 
+  menus: IMenuItem[];
 }
 
 export interface IApiResponse<T> {
@@ -48,4 +48,49 @@ export interface IFinancialData {
   currentMonth: IDashboardSummary;
   lastMonth: IDashboardSummary;
   lastYear: IDashboardSummary;
+}
+
+export interface IFullPaymentPlan {
+  PaymentPlanMaster: IPaymentPlanMaster;
+  PaymentPlanDetails: IPaymentPlanDetail[];
+  ServiceRate: IServiceRate;
+  Plots: IPlot[];
+}
+
+export interface IPaymentPlanMaster {
+  PaymentPlanID: number;
+  PaymentPlanName: string;
+  Description: string;
+  CreatedAt: string;
+}
+
+export interface IPaymentPlanDetail {
+  InstallmentNumber: number;
+  DueDate: string;
+  Percentage: number;
+  TotalAmount: number;
+}
+
+export interface IServiceRate {
+  RateID: number;
+  TotalAmount: number;
+  StartMonth: number;
+  StartYear: number;
+  EndMonth: number;
+  EndYear: number;
+  CategoryRate: number;
+  PlotTypeRate: number;
+  FloorRate:number;
+  CategoryName: string;
+  TypeName: string;
+  Floor: string;
+}
+
+export interface IPlot {
+  PlotID: number;
+  HouseNo: string;
+  CategoryID: number;
+  TypeID: number;
+  FloorID: number;
+  UserID: number | null;
 }

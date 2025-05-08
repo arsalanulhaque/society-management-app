@@ -74,7 +74,7 @@ export const AppSidebar: React.FC = () => {
           <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
             <FileText size={18} className="text-primary-foreground" />
           </div>
-          <span className="font-semibold text-lg">Housing Management System</span>
+          <span className="font-semibold text-lg">Al-Ashraf Society</span>
         </div>
       </SidebarHeader>
       <SidebarContent>

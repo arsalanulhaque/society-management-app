@@ -17,6 +17,7 @@ import AdminTools1 from "./pages/AdminTools1";
 import PaymentManagement from "./pages/payment-management/PaymentManagement";
 import SystemManagement from "./pages/system-management/SystemManagement";
 import Unauthorized from "./pages/Unauthorized";
+import PaymentPlanDetails from "./pages/payment-management/PaymentPlanDetails";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +78,12 @@ const App = () => (
               }
             />
 
+            <Route
+              path="/payment-plan-details"
+              element={
+                <PaymentPlanDetails />
+              }
+            />
             <Route
               path="/unauthorized"
               element={

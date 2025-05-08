@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from 
 import { PenSquare, Plus, Trash2 } from 'lucide-react';
 import { IAction } from '@/types/database';
 import { useAction } from './useAction';
+import { IconTooltip } from '@/components/common/IconTooltip';
 
 const ActionFormSchema = z.object({
   ActionName: z.string().min(1, "Action name is required"),
@@ -21,7 +22,7 @@ export const ActionTab: React.FC = () => {
   const fullUrl = pathname + search;
   const { hasPermission } = useAuth();
 
-  const { actions, loading, addAction, updateAction, deleteAction, refresh} = useAction();
+  const { actions, loading, addAction, updateAction, deleteAction, refresh } = useAction();
 
   const [activeForm, setActiveForm] = useState<boolean>(false);
   const [selectedAction, setSelectedAction] = useState<IAction | null>(null);
@@ -70,15 +71,13 @@ export const ActionTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 border p-4 rounded-md ">
       {loading ? (
         <p>Loading...</p>
       ) : (
         <>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center border-b pb-4 mb-4">
             <h2 className="text-2xl font-bold">Actions</h2>
-
-
             {hasPermission(fullUrl, 'CanAdd') && (
               <Button onClick={handleAddAction} className="flex items-center gap-2">
                 <Plus size={16} />
@@ -125,51 +124,46 @@ export const ActionTab: React.FC = () => {
             </Card>
           )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Action List</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <div className="grid grid-cols-4 p-4 bg-muted/50 font-medium text-sm">
-                  <div className="col-span-1">Action</div>
+          <div className="rounded-md border">
+            <div className="grid grid-cols-4 p-4 bg-muted/50 font-medium text-sm">
+              <div className="col-span-1">Action</div>
+            </div>
+            {actions.map((action) => (
+              <div
+                key={action.ActionID}
+                className="grid grid-cols-4 p-4 border-t text-sm items-center"
+              >
+                <div className="col-span-1">{action.ActionName}</div>
+                <div className="col-span-3 flex justify-end gap-2">
+                  {hasPermission(fullUrl, 'CanUpdate') && (
+                    <IconTooltip tooltip='Edit' >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditAction(action)}
+                        className="flex items-center gap-1 bg-slate-200 text-slate-500 hover:bg-slate-100">
+                        <PenSquare size={14} />
+                      </Button>
+                    </IconTooltip>
+                  )}
+                  {hasPermission(fullUrl, 'CanDelete') && (
+                    <IconTooltip tooltip='Delete'>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteAction(action.ActionID)}
+                        className="flex items-center gap-1 bg-slate-200 text-red-500 hover:text-red-500 hover:bg-slate-100">
+                        <Trash2 size={14} />
+                      </Button>
+                    </IconTooltip>
+                  )}
                 </div>
-                {actions.map((action) => (
-                  <div
-                    key={action.ActionID}
-                    className="grid grid-cols-4 p-4 border-t text-sm items-center"
-                  >
-                    <div className="col-span-1">{action.ActionName}</div>
-                    <div className="col-span-3 flex justify-end gap-2">
-                      {hasPermission(fullUrl, 'CanUpdate') && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditAction(action)}
-                          className="flex items-center gap-1"
-                        >
-                          <PenSquare size={14} />
-                          <span>Edit</span>
-                        </Button>
-                      )}
-                      {hasPermission(fullUrl, 'CanDelete') && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteAction(action.ActionID)}
-                          className="text-red-500 hover:text-red-600 flex items-center gap-1"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
               </div>
+            ))}
+          </div>
 
-            </CardContent>
-          </Card>
-        </>)}
-    </div>
+        </>)
+      }
+    </div >
   );
 };

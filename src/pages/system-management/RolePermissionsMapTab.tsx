@@ -37,14 +37,27 @@ export const RolePermissionsMapTab: React.FC = () => {
   // };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 border p-4 rounded-md ">
       {loading ? (
         <p>Loading...</p>
       ) : (
         <>
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center border-b pb-4 mb-4">
             <h2 className="text-2xl font-bold">Roles - Permissions</h2>
           </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Info size={18} />
+                Important Note
+              </CardTitle>
+              <CardDescription>
+                Select a Role to view or edit its permissions.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
 
           {/* Grid Layout */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -141,10 +154,10 @@ export const RolePermissionsMapTab: React.FC = () => {
             {/* Col 2 & 3 - Role List spanning two rows */}
             <div className="md:col-span-2 row-span-2">
 
-                <PermissionsGroupingGrid
-                  roleMenuActionsMap={roleMenuActionsMap}
-                  selectedRole={filterRole}
-                  saveChanges={saveChanges} />
+              <PermissionsGroupingGrid
+                roleMenuActionsMap={roleMenuActionsMap}
+                selectedRole={filterRole}
+                saveChanges={saveChanges} />
 
             </div>
           </div>
